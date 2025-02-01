@@ -39,4 +39,4 @@ A simple automated windows installer in C++
 	- A: Yes, you should download the latest release to ensure that you have the latest version of the application and that you don't have to build it yourself.
 
 - Q: Can I use this to install Windows 7 with?
-	A: Yes you can, just make sure that you have CSM enabled in your BIOS and that you have the needed drivers ready after install, and that you're using the MBR partitioning scheme.
+	- A: Yes you can, just make sure that you have CSM enabled in your BIOS and that you have the needed drivers ready after install, and that you're using the MBR partitioning scheme.
