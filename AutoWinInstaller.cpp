@@ -65,7 +65,7 @@ void WriteImg() {
             system(command.c_str());
         }
         if (gptan == "m") {
-            string command = "bcdboot R:""\\Windows"";
+            string command = "bcdboot R:""\\Windows""";
             system(command.c_str());
         }
         std::cout << "Image write was successful! Press the enter key to go back to the main menu!" << std::endl;
