@@ -57,11 +57,15 @@ void WriteImg() {
         system("pause");
         std::string command = "dism /apply-image /imagefile:" + imgFile + " /index:1 /applydir:R:";
         system(command.c_str());
-        cout << "Are you using the GPT scheme for your disk? [Y/N]";
+        cout << "Did you use MBR or GPT for disk partition scheme? [m/g]";
         string gptan;
         cin >> gptan;
-        if (gptan == "y") {
+        if (gptan == "g") {
             string command = "bcdboot R:""\\Windows"" /s W:";
+            system(command.c_str());
+        }
+        if (gptan == "m") {
+            string command = "bcdboot R:""\\Windows"";
             system(command.c_str());
         }
         std::cout << "Image write was successful! Press the enter key to go back to the main menu!" << std::endl;
@@ -125,12 +129,32 @@ void setupDisk() {
         string format;
         cin >> format;
         if (format == "m") {
-            mbrOpt(x);
-            backMenu();
+            cout << "Are you sure you want to proceed? This will wipe all data on the selected drive! [Y/N]";
+			string ans;
+            cin >> ans;
+            if (ans == "y") {
+				mbrOpt(x);
+				backMenu();
+            }
+			if (ans == "n") {
+				cout << "Operation has been cannceled! Returning to the main menu!";
+				system("pause");
+				main();
+			}
         }
         if (format == "g") {
-            efiOpt(x);
-            backMenu();
+            cout << "Are you sure you want to proceed? This will wipe all data on the selected drive! [Y/N]";
+            string ans;
+            cin >> ans;
+            if (ans == "y") {
+                efiOpt(x);
+                backMenu();
+            }
+            if (ans == "n") {
+                cout << "Operation has been cannceled! Returning to the main menu!";
+                system("pause");
+                main();
+            }
         }
     }
     if (option == "n") {
