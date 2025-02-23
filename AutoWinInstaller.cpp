@@ -58,13 +58,17 @@ void WriteImg() {
     if (option == "y") {
         string efiPar;
         string winPar;
+        int indexImg;
         cout << "Input the EFI partition letter: ";
         cin >> efiPar;
         cout << "Input the Windows partition letter: ";
         cin >> winPar;
+        commandRun("dism /Get-WimInfo /WimFile:" + imgFile + "");
+        cout << "Input your index number from above";
+        cin >> indexImg;
         cout << "Once your ready to write the image, press enter to proceed with this operation!";
         system("pause>nul");
-        commandRun("dism /apply-image /imagefile:" + imgFile + " /index:1 /applydir:" + winPar + ":""\"");
+        commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
         cout << "Did you use MBR or GPT for disk partition scheme? [m/g]";
         string gptan;
         cin >> gptan;
