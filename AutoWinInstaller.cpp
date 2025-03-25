@@ -38,21 +38,29 @@ void optionSel() {
     cout << "Enter the number: ";
     cin >> option;
     if (option == 1) {
+		system("cls");
         setupDisk();
     }
     if (option == 2) {
+        system("cls");
         WriteImg();
     }
     if (option == 3) {
         exit(-1);
+	}
+    else {
+        cout << "Invalid option! Please try again!";
+        system("pause>nul");
+        system("cls");
+        optionSel();
     }
 }
 
 void WriteImg() {
     string imgFile;
-    cout << "Please input the path of your WIM file!";
+    cout << "Enter the WIM file path. Should be either be named 'install.esd' or 'install.wim'. \n";
     cin >> imgFile;
-    cout << "Is this correct? [Y/N]";
+    cout << "Is this correct? [Y/N] ";
     string option;
     cin >> option;
     if (option == "y") {
@@ -64,19 +72,19 @@ void WriteImg() {
         cout << "Input the Windows partition letter: ";
         cin >> winPar;
         commandRun("dism /Get-WimInfo /WimFile:" + imgFile + "");
-        cout << "Input your index number from above";
+        cout << "Input your index number from above: ";
         cin >> indexImg;
         cout << "Once your ready to write the image, press enter to proceed with this operation!";
         system("pause>nul");
         commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
-        cout << "Did you use MBR or GPT for disk partition scheme? [m/g]";
+        cout << "Did you use MBR or GPT for disk partition scheme? [m/g] ";
         string gptan;
         cin >> gptan;
         if (gptan == "g") {
-            commandRun("bcdboot R:""\\Windows"" /s " + efiPar + ":");
+            commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + efiPar + ":");
         }
         if (gptan == "m") {
-            commandRun("bcdboot R:""\\Windows""");
+            commandRun("bcdboot " + winPar + ":""\\Windows""");
         }
         cout << "Image write was successful! Press the enter key to go back to the main menu!";
         backMenu();
@@ -102,7 +110,9 @@ void createFi(string file, string text) {
 }
 
 void setupDisk() {
+    cout << "Check the README for how you can setup your disk!\n";
     system("diskpart");
+    cout << "\n";
     cout << "Please be sure that you know what your drive letters that you set for your disk setup! \n";
     cout << "If you know what they are, you may exit this step!";
     backMenu();
