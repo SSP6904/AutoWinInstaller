@@ -1,6 +1,6 @@
 // AutoWinInstaller.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <windows.h>
 #include <stdio.h>
@@ -23,7 +23,14 @@ void createFi(string file, string text);
 int main()
 {
     SetConsoleTitle(L"Automated Windows Installer");
-    optionSel();
+	cout << "Welcome to the Automated Windows Installer!\n";
+    cout << "==============================================\n";
+    cout << "Created by SSP6904 (https://shaunhoffer.cc)\n";
+    cout << "If you're ready to go, press the enter key to continue! Otherwise, you may close this application!";
+	if (cin.ignore()) {
+		system("cls");
+		optionSel();
+	}
 }
 
 void commandRun(string cmd) {
@@ -31,24 +38,32 @@ void commandRun(string cmd) {
 }
 
 void optionSel() {
-    int option;
+	int option = 0;
     cout << "1 - Setup the disk\n";
     cout << "2 - Write the image file\n";
     cout << "3 - Quit the application\n";
     cout << "Enter the number: ";
     cin >> option;
-    if (option == 1) {
+    switch (option) {
+
+    // Setup the disk
+	case 1:
 		system("cls");
-        setupDisk();
-    }
-    if (option == 2) {
+		setupDisk();
+		break;
+
+	// Write the image file
+    case 2:
         system("cls");
-        WriteImg();
-    }
-    if (option == 3) {
-        exit(-1);
-	}
-    else {
+		WriteImg();
+		break;
+
+	// Quit the application
+	case 3:
+		exit(-1);
+
+	// Invalid option (default)
+    default:
         cout << "Invalid option! Please try again!";
         system("pause>nul");
         system("cls");
@@ -60,37 +75,57 @@ void WriteImg() {
     string imgFile;
     cout << "Enter the WIM file path. Should be either be named 'install.esd' or 'install.wim'. \n";
     cin >> imgFile;
-    cout << "Is this correct? [Y/N] ";
-    string option;
-    cin >> option;
-    if (option == "y") {
+
+	// Checks if the image file exists
+	if (fopen(imgFile.c_str(), "r") == NULL) {
+		cout << "The image file does not exist! Please try again!";
+		system("pause>nul");
+		system("cls");
+		WriteImg();
+	}
+    int indexImg;
+    string gptan;
+
+	// Grabs the data from the image file and asks for the index number
+    commandRun("dism /Get-WimInfo /WimFile:" + imgFile + "");
+    cout << "Input your index number from above: ";
+    cin >> indexImg;
+
+	// Asks if the disk partition scheme is MBR or GPT
+    cout << "Did you use MBR or GPT for disk partition scheme? [m/g] ";
+    cin >> gptan;
+    
+	// Choose this if the partion scheme is GPT
+    if (gptan == "g") {
         string efiPar;
         string winPar;
-        int indexImg;
-        cout << "Input the EFI partition letter: ";
+        cout << "Input the EFI partiton letter: ";
         cin >> efiPar;
         cout << "Input the Windows partition letter: ";
         cin >> winPar;
-        commandRun("dism /Get-WimInfo /WimFile:" + imgFile + "");
-        cout << "Input your index number from above: ";
-        cin >> indexImg;
-        cout << "Once your ready to write the image, press enter to proceed with this operation!";
-        system("pause>nul");
+        cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
         commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
-        cout << "Did you use MBR or GPT for disk partition scheme? [m/g] ";
-        string gptan;
-        cin >> gptan;
-        if (gptan == "g") {
-            commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + efiPar + ":");
-        }
-        if (gptan == "m") {
-            commandRun("bcdboot " + winPar + ":""\\Windows""");
-        }
+        cout << "Adding the required boot files. Please wait!\n";
+        commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + efiPar + ":"" /f UEFI");
+        system("cls");
         cout << "Image write was successful! Press the enter key to go back to the main menu!";
         backMenu();
     }
-    if (option == "n") {
-        cout << "Please retry this operation to change your image file!";
+
+	// Choose this if the partion scheme is MBR
+    if (gptan == "m") {
+        string winPar;
+        string sysresPar;
+        cout << "Input the Windows partition letter: ";
+        cin >> winPar;
+        cout << "Input the System Reserved partition letter: ";
+        cin >> sysresPar;
+        cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
+        commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
+        cout << "Adding the required boot files. Please wait!\n";
+        commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + sysresPar + ":"" /f BIOS");
+        system("cls");
+        cout << "Image write was successful! Press the enter key to go back to the main menu!";
         backMenu();
     }
 }
