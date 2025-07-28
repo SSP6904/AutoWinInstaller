@@ -36,5 +36,8 @@
     <Image Include="iconwin.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="appicon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

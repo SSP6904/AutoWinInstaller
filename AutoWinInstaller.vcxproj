@@ -137,6 +137,7 @@
     <ResourceCompile Include="AutoWinInstaller.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="appicon.ico" />
     <Image Include="icon1.ico" />
     <Image Include="iconwin.ico" />
   </ItemGroup>
