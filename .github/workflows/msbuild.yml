@@ -29,8 +29,7 @@ jobs:
     - name: Publish
       uses: softprops/action-gh-release@v1
       with:
-          files: |
-            \x64\Release\AutoWinInstaller.exe
+          files: ./x64/Release/AutoWinInstaller.exe
           draft: false
           prerelease: false
           generate_release_notes: true
