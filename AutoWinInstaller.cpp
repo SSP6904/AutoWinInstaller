@@ -34,7 +34,13 @@ int main()
 }
 
 void commandRun(string cmd) {
-    system(cmd.c_str());
+    int runCmd = system(cmd.c_str());
+    if (runCmd != 0) {
+        cout << "Something went wrong while trying to run this command! Sorry about that! If this is an issue with the program, please submit it to the programs GitHub repository!";
+        cout << "Press any key to exit the program";
+        cin.ignore();
+        exit(-1);
+    }
 }
 
 void optionSel() {
@@ -45,29 +51,25 @@ void optionSel() {
     cout << "Enter the number: ";
     cin >> option;
     switch (option) {
-
-    // Setup the disk
-	case 1:
-		system("cls");
-		setupDisk();
-		break;
-
-	// Write the image file
-    case 2:
-        system("cls");
-		WriteImg();
-		break;
-
-	// Quit the application
-	case 3:
-		exit(-1);
-
-	// Invalid option (default)
-    default:
-        cout << "Invalid option! Please try again!";
-        system("pause>nul");
-        system("cls");
-        optionSel();
+        // Setup the disk
+	    case 1:
+		    system("cls");
+		    setupDisk();
+		    break;
+	    // Write the image file
+        case 2:
+            system("cls");
+		    WriteImg();
+		    break;
+	    // Quit the application
+	    case 3:
+		    exit(-1);
+	    // Invalid option (default)
+        default:
+            cout << "Invalid option! Please try again!";
+            system("pause>nul");
+            system("cls");
+            optionSel();
     }
 }
 
