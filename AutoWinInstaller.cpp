@@ -12,13 +12,21 @@
 
 using namespace std;
 
+// Global variables
 void WriteImageFile();
 void DiskPartionSetup();
 string writeDiskScript(string content);
 void commandRun(string cmd);
 
+string bcdboot = "%systemroot%\\System32\\bcdboot.exe";
+string diskpart = "%systemroot%\\System32\\diskpart.exe";
+string dism = "%systemroot%\\System32\\dism.exe";
+
+string app_title = "Automated Windows Installer";
+
+
 int main() {
-    SetConsoleTitle(L"Automated Windows Installer");
+    SetConsoleTitleA(app_title.c_str());
     cout << "Menu selection: \n";
     cout << "[1] - Setup the disk\n";
     cout << "[2] - Write the image file\n";
@@ -39,8 +47,8 @@ int main() {
                 exit(-1);
                 break;
             default:
-                cout << "Invalid option! Please try again!";
-                cin.ignore();
+                cout << "Invalid option! Please try again!\n";
+                system("pause>nul");
                 system("cls");
                 main();
                 break;
@@ -57,7 +65,7 @@ void DiskPartionSetup() {
     cout << "If you are ready to begin, press the enter key!\n";
     if (cin.ignore()) {
         // Step 1
-        commandRun("diskpart /s ./" + writeDiskScript(
+        commandRun(diskpart + " /s ./" + writeDiskScript(
             "list disk\n"
             "exit"
         ));
@@ -71,7 +79,7 @@ void DiskPartionSetup() {
             switch (disk_type) {
                 case 'm':
                 case 'M':
-                    commandRun("diskpart /s " + writeDiskScript(
+                    commandRun(diskpart + " /s " + writeDiskScript(
                         "select disk " + disk_number + "\n"
                         "clean\n"
                         "convert mbr\n"
@@ -79,7 +87,7 @@ void DiskPartionSetup() {
                     ));
                     cout << "\n";
                     cout << "Creating the required partitons! Please wait a moment!";
-                    commandRun("diskpart /s " + writeDiskScript(
+                    commandRun(diskpart + " /s " + writeDiskScript(
                         "select disk " + disk_number + "\n"
                         "create part primary size=100\n"
                         "format fs=ntfs label=SYSTEM quick\n"
@@ -101,7 +109,7 @@ void DiskPartionSetup() {
                     break;
                 case 'g':
                 case 'G':
-                    commandRun("diskpart /s " + writeDiskScript(
+                    commandRun(diskpart + " /s " + writeDiskScript(
                         "select disk " + disk_number + "\n"
                         "clean\n"
                         "convert gpt\n"
@@ -109,7 +117,7 @@ void DiskPartionSetup() {
                     ));
                     cout << "\n";
                     cout << "Creating the required partitons! Please wait a moment!";
-                    commandRun("diskpart /s " + writeDiskScript(
+                    commandRun(diskpart + " /s " + writeDiskScript(
                         "select disk " + disk_number + "\n"
                         "create part EFI size=500\n"
                         "format fs=fat32 label=EFI quick\n"
@@ -148,13 +156,13 @@ void WriteImageFile() {
 	// Checks if the image file exists
 	if (file.is_open()) {
         // Grabs the data from the image file and asks for the index number
-        commandRun("dism /Get-WimInfo /WimFile:" + imgFile + "");
+        commandRun(dism + " /Get-WimInfo /WimFile:" + imgFile + "");
         cout << "Input the index number from above: ";
         cin >> indexImg;
 
         if (indexImg == NULL) {
             cout << "The number you typed in is either invaild or is not a number! Please try again! Exiting the program!";
-            cin.ignore();
+            system("pause>nul");
             exit(-1);
         }
 
@@ -173,14 +181,16 @@ void WriteImageFile() {
                     cin >> winPar;
                     cout << "Input the System Reserved partition letter: ";
                     cin >> sysresPar;
-                    cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
-                    commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
-                    cout << "Adding the required boot files. Please wait!\n";
-                    commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + sysresPar + ":"" /f BIOS");
                     system("cls");
-                    cout << "Image write was successful! Press the enter key to go back to the main menu!";
+                    cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
+                    commandRun(dism + " /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
+                    cout << "\n";
+                    cout << "Adding the required boot files. Please wait!\n";
+                    commandRun(bcdboot + " " + winPar + ":""\\Windows"" /s " + sysresPar + ":"" /f BIOS");
+                    system("cls");
+                    cout << "Image write was successful! Press the enter key to go back to the main menu!\n";
 
-                    cin.ignore();
+                    system("pause>nul");
                     system("cls");
                     main();
                     break;
@@ -194,14 +204,16 @@ void WriteImageFile() {
                     cin >> efiPar;
                     cout << "Input the Windows partition letter: ";
                     cin >> winPar;
-                    cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
-                    commandRun("dism /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
-                    cout << "Adding the required boot files. Please wait!\n";
-                    commandRun("bcdboot " + winPar + ":""\\Windows"" /s " + efiPar + ":"" /f UEFI");
                     system("cls");
-                    cout << "Image write was successful! Press the enter key to go back to the main menu!";
+                    cout << "Starting the image writing! Please do not close this window while the writing is in progress!\n";
+                    commandRun(dism + " /apply-image /imagefile:" + imgFile + " /index:" + to_string(indexImg) + " /applydir:" + winPar + ":""\"");
+                    cout << "\n";
+                    cout << "Adding the required boot files. Please wait!\n";
+                    commandRun(bcdboot + " " + winPar + ":""\\Windows"" /s " + efiPar + ":"" /f UEFI");
+                    system("cls");
+                    cout << "Image write was successful! Press the enter key to go back to the main menu!\n";
 
-                    cin.ignore();
+                    system("pause>nul");
                     system("cls");
                     main();
                     break;
@@ -215,7 +227,7 @@ void WriteImageFile() {
     }
     else {
         cout << "The image file does not exist! Please try again!";
-        cin.ignore();
+        system("pause>nul");
         system("cls");
         WriteImageFile();
     }
@@ -227,8 +239,8 @@ void commandRun(string cmd) {
     if (runCmd != 0) {
         cout << "\n";
         cout << "Something went wrong while trying to run this command!\n";
-        cout << "Press any key to exit the program";
-        cin.ignore();
+        cout << "Press any key to exit the program\n";
+        system("pause>nul");
         exit(-1);
     }
 }
@@ -243,7 +255,7 @@ string writeDiskScript(string content) {
     }
     else {
         perror("Something went wrong while trying to create the diskpart script! Exiting now!");
-        cin.ignore();
+        system("pause>nul");
         exit(-1);
     }
 }
